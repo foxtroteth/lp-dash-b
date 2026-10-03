@@ -1,0 +1,429 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Widgetax Revenue</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  /* Apex Terminal look (from the Apex Discovery console): near-black grid,
+     neon accents, mono tabular numerals. Dark only, as there. */
+  :root {
+    color-scheme: dark;
+    --bg: #080B0F; --bg2: #0B0F14; --surface: #0F141B; --surface2: #161D27;
+    --line: #1F2A36; --grid: rgba(31,42,54,0.55); --neon-line: rgba(0,224,153,0.28);
+    --ink: #E8EDF2; --ink-2: #8A97A6; --ink-3: #55606D;
+    --accent: #00E08A; --accent2: #7C5CFF; --bad: #FF3B6B;
+    /* chart marks, validated on the surface: open fee, fee share */
+    --s1: #00AD6B; --s2: #7C5CFF;
+    --sans: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+    --mono: "IBM Plex Mono", "SF Mono", ui-monospace, Menlo, Consolas, monospace;
+  }
+  * { box-sizing: border-box; }
+  html { background: var(--bg); }
+  body { margin: 0; color: var(--ink); font: 15px/1.45 var(--sans); -webkit-font-smoothing: antialiased; min-height: 100vh;
+    background:
+      linear-gradient(rgba(0,224,153,0.025) 1px, transparent 1px) 0 0 / 100% 38px,
+      linear-gradient(90deg, rgba(0,224,153,0.025) 1px, transparent 1px) 0 0 / 38px 100%,
+      radial-gradient(1200px 600px at 78% -8%, rgba(124,92,255,0.10), transparent 60%),
+      radial-gradient(1000px 560px at 8% 0%, rgba(0,224,153,0.08), transparent 55%),
+      linear-gradient(180deg, var(--bg2) 0%, var(--bg) 60%);
+    background-attachment: fixed; }
+  .wrap { max-width: 1100px; margin: 0 auto; padding: 28px 16px 64px; }
+  h1 { font-size: 24px; font-weight: 800; margin: 0; letter-spacing: 0.01em; }
+  h1 .dot { color: var(--accent); text-shadow: 0 0 12px rgba(0,224,153,0.6); }
+  h2 { font-size: 16px; font-weight: 700; margin: 0 0 14px; display: flex; align-items: center; gap: 10px; }
+  h2::before { content: ""; width: 3px; height: 18px; border-radius: 3px; flex: none;
+    background: linear-gradient(180deg, var(--accent), var(--accent2)); box-shadow: 0 0 10px rgba(0,224,138,0.4); }
+  .sub { color: var(--ink-2); font-size: 13px; }
+  .top { display: flex; justify-content: space-between; align-items: flex-end; gap: 12px; flex-wrap: wrap; margin-bottom: 20px; }
+  .card { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 16px; margin-bottom: 14px;
+    box-shadow: 0 8px 28px rgba(0,0,0,0.35); }
+  .tiles { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 10px; margin-bottom: 14px; }
+  @media (max-width: 980px) { .tiles { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+  @media (max-width: 560px) { .tiles { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+  .tile { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 12px 16px; box-shadow: 0 6px 20px rgba(0,0,0,0.35); }
+  .tile.hero { border-color: var(--neon-line); box-shadow: 0 0 0 1px rgba(0,224,153,0.10), 0 8px 28px rgba(0,224,153,0.08); }
+  .tile .k { font-size: 11px; color: var(--ink-2); display: flex; align-items: center; gap: 6px; text-transform: uppercase; letter-spacing: 0.08em; font-weight: 600; }
+  .tile .v { font: 600 24px/1.2 var(--mono); margin-top: 4px; font-variant-numeric: tabular-nums; letter-spacing: -0.01em; }
+  .tile.hero .v { color: var(--accent); }
+  .tile .n { font-size: 12px; color: var(--ink-3); }
+  .sw { width: 10px; height: 10px; border-radius: 3px; display: inline-block; flex: none; }
+  .legend { display: flex; gap: 14px; font-size: 13px; color: var(--ink-2); margin: -6px 0 8px; flex-wrap: wrap; }
+  .legend span { display: inline-flex; align-items: center; gap: 6px; }
+  .chart { position: relative; }
+  svg { display: block; width: 100%; height: auto; overflow: visible; }
+  .axis text { fill: var(--ink-3); font: 11px var(--mono); }
+  .tip { position: absolute; pointer-events: none; background: var(--surface2); border: 1px solid var(--line);
+    border-radius: 8px; padding: 8px 10px; font-size: 12px; box-shadow: 0 12px 32px rgba(0,0,0,0.55);
+    min-width: 170px; display: none; z-index: 2; }
+  .tip b { display: block; margin-bottom: 4px; }
+  .tip .row { display: flex; justify-content: space-between; gap: 12px; align-items: center; font-family: var(--mono); }
+  .tip .row span:first-child { display: inline-flex; gap: 6px; align-items: center; color: var(--ink-2); font-family: var(--sans); }
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  @media (max-width: 760px) { .grid2 { grid-template-columns: 1fr; } }
+  table { width: 100%; border-collapse: separate; border-spacing: 0; font: 13px var(--mono); font-variant-numeric: tabular-nums; }
+  th { text-align: left; color: var(--ink-2); font: 700 10.5px var(--sans); text-transform: uppercase; letter-spacing: 0.07em;
+    background: var(--surface2); border-bottom: 1px solid var(--line); padding: 9px 10px; white-space: nowrap; }
+  th:first-child { border-top-left-radius: 8px; } th:last-child { border-top-right-radius: 8px; }
+  td { border-bottom: 1px solid var(--grid); padding: 8px 10px; white-space: nowrap; }
+  tr:hover td { background: rgba(255,255,255,0.03); }
+  th.r, td.r { text-align: right; }
+  td.hi { color: var(--accent); font-weight: 700; }
+  .scroll { overflow-x: auto; border: 1px solid var(--line); border-radius: 9px; }
+  a { color: var(--accent); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  .mono { font-family: var(--mono); font-size: 12.5px; }
+  button { font: 600 13px var(--sans); border: 1px solid var(--line); background: linear-gradient(180deg, var(--surface2), var(--surface));
+    color: var(--ink); border-radius: 9px; padding: 7px 12px; cursor: pointer; }
+  button:hover { border-color: var(--neon-line); color: #fff; }
+  button:disabled { opacity: 0.35; cursor: default; }
+  .btn-p { background: var(--accent); border: 0; color: #03130C; font-weight: 700;
+    box-shadow: 0 0 0 1px rgba(0,224,153,0.35), 0 6px 18px rgba(0,224,153,0.18); }
+  .btn-p:hover { filter: brightness(1.06); color: #03130C; }
+  .gate { max-width: 380px; margin: 16vh auto 0; }
+  .gate input[type=password] { width: 100%; font: 14px var(--mono); padding: 11px 12px; border-radius: 9px; border: 1px solid var(--line);
+    background: var(--bg); color: var(--ink); margin: 12px 0; outline: none; }
+  .gate input[type=password]:focus { border-color: var(--neon-line); box-shadow: 0 0 0 3px rgba(0,224,153,0.12); }
+  .err { color: var(--bad); font-size: 13px; min-height: 18px; }
+  .note { font-size: 12px; color: var(--ink-3); margin-top: 8px; }
+  .tabs { display: flex; gap: 4px; }
+  .tabs button[aria-pressed="true"] { color: var(--accent); border-color: rgba(0,224,153,0.45); background: rgba(0,224,153,0.06); }
+  .pager { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-top: 10px; font-size: 12px; color: var(--ink-2); }
+  .pager .ctl { display: flex; gap: 6px; align-items: center; }
+  .pager button { padding: 5px 10px; font-size: 12px; }
+  ::-webkit-scrollbar { width: 10px; height: 10px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--surface2); border-radius: 8px; border: 2px solid var(--bg); }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <section class="gate card" id="gate">
+    <h1>Widgetax Revenue<span class="dot">.</span></h1>
+    <p class="sub">Enter the password to open the dashboard.</p>
+    <form id="gateForm">
+      <input type="password" id="pw" autocomplete="current-password" placeholder="Password" required>
+      <label class="sub"><input type="checkbox" id="remember"> Remember on this device</label>
+      <div style="margin-top:12px; display:flex; gap:10px; align-items:center">
+        <button class="btn-p" type="submit" id="go">Open</button>
+        <span class="err" id="err"></span>
+      </div>
+    </form>
+  </section>
+
+  <main id="app" hidden>
+    <div class="top">
+      <div>
+        <h1>Widgetax Revenue<span class="dot">.</span></h1>
+        <div class="sub" id="meta"></div>
+      </div>
+      <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap">
+        <div class="tabs" id="range">
+          <button data-days="7">7D</button><button data-days="30">30D</button><button data-days="0" aria-pressed="true">All</button>
+        </div>
+        <button id="csv">Download CSV</button>
+        <button id="lock">Lock</button>
+      </div>
+    </div>
+
+    <div class="tiles" id="tiles"></div>
+
+    <section class="card">
+      <h2>Daily revenue (USDG, days in WIB)</h2>
+      <div class="legend"><span><i class="sw" style="background:var(--s1)"></i>Open fee (0.3 USDG per open)</span><span><i class="sw" style="background:var(--s2)"></i>Fee share (1.5% of LP fees)</span></div>
+      <div class="chart" id="daily"></div>
+    </section>
+
+    <div class="grid2">
+      <section class="card">
+        <h2>Cumulative revenue (USDG)</h2>
+        <div class="chart" id="cumul"></div>
+      </section>
+      <section class="card">
+        <h2>LP fees collected by users (USDG per day)</h2>
+        <div class="chart" id="lp"></div>
+        <div class="note">Worked out from the 1.5% share: share ÷ 0.015.</div>
+      </section>
+    </div>
+
+    <section class="card">
+      <h2>Contributors</h2>
+      <div class="scroll"><table id="who"></table></div>
+      <div class="pager" id="whoPager"></div>
+    </section>
+
+    <section class="card">
+      <h2>Daily table</h2>
+      <div class="scroll"><table id="days"></table></div>
+      <div class="pager" id="daysPager"></div>
+    </section>
+
+    <section class="card">
+      <h2>Payments</h2>
+      <div class="scroll"><table id="pays"></table></div>
+      <div class="pager" id="paysPager"></div>
+      <div class="note" id="otherNote"></div>
+    </section>
+  </main>
+</div>
+
+<script>
+(() => {
+  const EXPLORER = "https://robinhoodchain.blockscout.com";
+  const TZ = "Asia/Jakarta";
+  const $ = id => document.getElementById(id);
+  const usd = (n, d = 2) => (Number(n) || 0).toLocaleString("en-US", { minimumFractionDigits: d, maximumFractionDigits: d });
+  const short = a => a && a.length > 12 ? a.slice(0, 6) + "…" + a.slice(-4) : a;
+  const dayOf = iso => new Intl.DateTimeFormat("en-CA", { timeZone: TZ, year: "numeric", month: "2-digit", day: "2-digit" }).format(new Date(iso));
+  const timeOf = iso => new Intl.DateTimeFormat("en-GB", { timeZone: TZ, day: "2-digit", month: "short", hour: "2-digit", minute: "2-digit" }).format(new Date(iso));
+  const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+
+  // ---- decrypt (same parameters as vault.mjs)
+  const unb64 = s => Uint8Array.from(atob(s), c => c.charCodeAt(0));
+  async function openBox(box, password) {
+    const base = await crypto.subtle.importKey("raw", new TextEncoder().encode(password), "PBKDF2", false, ["deriveKey"]);
+    const key = await crypto.subtle.deriveKey({ name: "PBKDF2", hash: "SHA-256", salt: unb64(box.salt), iterations: box.iter },
+      base, { name: "AES-GCM", length: 256 }, false, ["decrypt"]);
+    const pt = await crypto.subtle.decrypt({ name: "AES-GCM", iv: unb64(box.iv) }, key, unb64(box.ct));
+    return JSON.parse(new TextDecoder().decode(pt));
+  }
+  const store = {
+    get() { try { return localStorage.getItem("lpdash.pw"); } catch (e) { return null; } },
+    set(v) { try { localStorage.setItem("lpdash.pw", v); } catch (e) {} },
+    clear() { try { localStorage.removeItem("lpdash.pw"); } catch (e) {} },
+  };
+  async function unlock(pw, remember) {
+    $("err").textContent = ""; $("go").disabled = true; $("go").textContent = "Opening…";
+    try {
+      const r = await fetch("data/db.enc?t=" + Date.now(), { cache: "no-store" });
+      if (!r.ok) throw new Error("no data yet");
+      const db = await openBox(await r.json(), pw);
+      if (remember) store.set(pw);
+      $("gate").hidden = true; $("app").hidden = false;
+      render(db);
+    } catch (e) {
+      $("err").textContent = e && e.name === "OperationError" ? "Wrong password." : "Could not open: " + (e.message || e);
+      store.clear();
+    } finally { $("go").disabled = false; $("go").textContent = "Open"; }
+  }
+  $("gateForm").addEventListener("submit", e => { e.preventDefault(); unlock($("pw").value, $("remember").checked); });
+  $("lock").addEventListener("click", () => { store.clear(); location.reload(); });
+  const saved = store.get();
+  if (saved) unlock(saved, true);
+
+  // ---- charts: plain SVG
+  function niceMax(v) {
+    if (!(v > 0)) return 1;
+    const p = Math.pow(10, Math.floor(Math.log10(v)));
+    for (const m of [1, 2, 2.5, 5, 10]) if (m * p >= v) return m * p;
+    return 10 * p;
+  }
+  function frame(el, W, H) {
+    el.innerHTML = "";
+    const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+    svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+    el.appendChild(svg);
+    const tip = document.createElement("div"); tip.className = "tip"; el.appendChild(tip);
+    return { svg, tip };
+  }
+  const svgEl = (svg, tag, attrs) => {
+    const e = document.createElementNS("http://www.w3.org/2000/svg", tag);
+    for (const k in attrs) e.setAttribute(k, attrs[k]);
+    svg.appendChild(e); return e;
+  };
+  function axes(svg, W, H, pad, max, labels, fmt) {
+    const g = svgEl(svg, "g", { class: "axis" });
+    for (let i = 0; i <= 4; i++) {
+      const y = pad.t + (H - pad.t - pad.b) * (1 - i / 4);
+      svgEl(g, "line", { x1: pad.l, x2: W - pad.r, y1: y, y2: y, stroke: "var(--grid)", "stroke-width": 1 });
+      const t = svgEl(g, "text", { x: pad.l - 6, y: y + 4, "text-anchor": "end" }); t.textContent = fmt(max * i / 4);
+    }
+    const every = Math.max(1, Math.ceil(labels.length / 8));
+    labels.forEach((l, i) => {
+      if (i % every && i !== labels.length - 1) return;
+      const x = pad.l + (W - pad.l - pad.r) * (labels.length === 1 ? 0.5 : (i + 0.5) / labels.length);
+      const t = svgEl(g, "text", { x, y: H - pad.b + 16, "text-anchor": "middle" }); t.textContent = l;
+    });
+  }
+  function place(el, tip, x, y) {
+    const w = el.clientWidth;
+    tip.style.display = "block";
+    const tw = tip.offsetWidth;
+    tip.style.left = Math.max(0, Math.min(w - tw, x - tw / 2)) + "px";
+    tip.style.top = Math.max(0, y - tip.offsetHeight - 12) + "px";
+  }
+  const tipRow = (color, label, value) =>
+    `<div class="row"><span>${color ? `<i class="sw" style="background:${color}"></i>` : ""}${label}</span><span>${value}</span></div>`;
+
+  // Stacked daily bars: open fee at the base, fee share on top, a 2px surface
+  // gap between them and a 4px rounded top.
+  function stacked(el, days) {
+    const W = Math.max(300, el.clientWidth || 960), H = W < 600 ? 220 : 280, pad = { l: 44, r: 8, t: 10, b: 26 };
+    const { svg, tip } = frame(el, W, H);
+    const max = niceMax(Math.max(...days.map(d => d.open + d.share), 0));
+    axes(svg, W, H, pad, max, days.map(d => d.label), v => usd(v, max < 5 ? 1 : 0));
+    const iw = (W - pad.l - pad.r) / days.length, bw = Math.max(2, Math.min(28, iw * 0.62));
+    const y = v => pad.t + (H - pad.t - pad.b) * (1 - v / max);
+    days.forEach((d, i) => {
+      const cx = pad.l + iw * (i + 0.5), x = cx - bw / 2, base = y(0);
+      const h1 = base - y(d.open), h2 = base - y(d.open + d.share) - h1;
+      const r = Math.min(4, bw / 2);
+      const top = (x0, y0, w, h) => `M${x0},${y0 + h} V${y0 + r} Q${x0},${y0} ${x0 + r},${y0} H${x0 + w - r} Q${x0 + w},${y0} ${x0 + w},${y0 + r} V${y0 + h} Z`;
+      if (d.share > 0 && d.open > 0) {
+        svgEl(svg, "rect", { x, y: base - h1, width: bw, height: Math.max(0, h1), fill: "var(--s1)" });
+        if (h2 > 2) svgEl(svg, "path", { d: top(x, base - h1 - h2, bw, h2 - 2), fill: "var(--s2)" });
+      } else if (d.open > 0 && h1 > 0) {
+        svgEl(svg, "path", { d: top(x, base - h1, bw, h1), fill: "var(--s1)" });
+      } else if (d.share > 0 && h2 > 0) {
+        svgEl(svg, "path", { d: top(x, base - h2, bw, h2), fill: "var(--s2)" });
+      }
+      const hit = svgEl(svg, "rect", { x: pad.l + iw * i, y: pad.t, width: iw, height: H - pad.t - pad.b, fill: "transparent" });
+      hit.addEventListener("mousemove", ev => {
+        tip.innerHTML = `<b>${d.day}</b>` + tipRow("var(--s1)", "Open fee", usd(d.open)) + tipRow("var(--s2)", "Fee share", usd(d.share))
+          + tipRow("", "Total", `<b style="margin:0">${usd(d.open + d.share)}</b>`) + tipRow("", "Payments", d.count);
+        const rct = el.getBoundingClientRect(); place(el, tip, ev.clientX - rct.left, ev.clientY - rct.top);
+      });
+      hit.addEventListener("mouseleave", () => { tip.style.display = "none"; });
+    });
+  }
+
+  // One series, 2px line, crosshair with a tooltip.
+  function line(el, days, key, name, color, fmt) {
+    const W = Math.max(300, el.clientWidth || 460), H = 220, pad = { l: 44, r: 8, t: 10, b: 26 };
+    const { svg, tip } = frame(el, W, H);
+    const vals = days.map(d => d[key]);
+    const max = niceMax(Math.max(...vals, 0));
+    axes(svg, W, H, pad, max, days.map(d => d.label), v => usd(v, max < 5 ? 1 : 0));
+    const iw = (W - pad.l - pad.r) / days.length;
+    const X = i => pad.l + iw * (i + 0.5), Y = v => pad.t + (H - pad.t - pad.b) * (1 - v / max);
+    svgEl(svg, "path", { d: vals.map((v, i) => `${i ? "L" : "M"}${X(i)},${Y(v)}`).join(" "),
+      fill: "none", stroke: color, "stroke-width": 2, "stroke-linejoin": "round", "stroke-linecap": "round" });
+    const cross = svgEl(svg, "line", { y1: pad.t, y2: H - pad.b, stroke: "var(--ink-3)", "stroke-width": 1, "stroke-dasharray": "3 3", visibility: "hidden" });
+    const dot = svgEl(svg, "circle", { r: 4, fill: color, stroke: "var(--surface)", "stroke-width": 2, visibility: "hidden" });
+    const hit = svgEl(svg, "rect", { x: pad.l, y: pad.t, width: W - pad.l - pad.r, height: H - pad.t - pad.b, fill: "transparent" });
+    hit.addEventListener("mousemove", ev => {
+      const r = svg.getBoundingClientRect();
+      const px = (ev.clientX - r.left) * W / r.width;
+      const i = Math.max(0, Math.min(days.length - 1, Math.floor((px - pad.l) / iw)));
+      cross.setAttribute("x1", X(i)); cross.setAttribute("x2", X(i)); cross.setAttribute("visibility", "visible");
+      dot.setAttribute("cx", X(i)); dot.setAttribute("cy", Y(vals[i])); dot.setAttribute("visibility", "visible");
+      tip.innerHTML = `<b>${days[i].day}</b>` + tipRow(color, name, fmt(vals[i]));
+      const er = el.getBoundingClientRect();
+      place(el, tip, X(i) * r.width / W + (r.left - er.left), Y(vals[i]) * r.height / H + (r.top - er.top));
+    });
+    hit.addEventListener("mouseleave", () => { tip.style.display = "none"; cross.setAttribute("visibility", "hidden"); dot.setAttribute("visibility", "hidden"); });
+  }
+
+  // ---- data
+  let DB = null, rangeDays = 0;
+  function daysBetween(a, b) {
+    const out = []; const d = new Date(a + "T00:00:00Z"), end = new Date(b + "T00:00:00Z");
+    while (d <= end) { out.push(d.toISOString().slice(0, 10)); d.setUTCDate(d.getUTCDate() + 1); }
+    return out;
+  }
+  function build(db) {
+    const pays = db.payments.map(p => ({ ...p, day: dayOf(p.ts) }));
+    const today = dayOf(new Date().toISOString());
+    const first = pays.length ? pays.reduce((a, p) => p.day < a ? p.day : a, today) : today;
+    let all = daysBetween(first, today);
+    if (rangeDays) all = all.slice(-rangeDays);
+    const from = all[0];
+    const inRange = pays.filter(p => p.day >= from);
+    const byDay = new Map(all.map(d => [d, { day: d, open: 0, share: 0, lpFees: 0, count: 0, who: new Set() }]));
+    for (const p of inRange) {
+      const d = byDay.get(p.day); if (!d) continue;
+      d.open += p.open; d.share += p.share; d.lpFees += p.lpFees; d.count++; d.who.add(p.from);
+    }
+    const days = [...byDay.values()];
+    let run = 0;
+    for (const d of days) {
+      run += d.open + d.share; d.cum = run;
+      d.label = new Date(d.day + "T00:00:00Z").toLocaleDateString("en-GB", { day: "numeric", month: "short", timeZone: "UTC" });
+    }
+    return { pays: inRange, days };
+  }
+  // Ten rows a page, so a long history does not flood the page.
+  const PAGE = 10, pageOf = {};
+  function paged(id, head, rows) {
+    const pages = Math.max(1, Math.ceil(rows.length / PAGE));
+    const pg = Math.min(pageOf[id] || 0, pages - 1);
+    pageOf[id] = pg;
+    $(id).innerHTML = head + rows.slice(pg * PAGE, pg * PAGE + PAGE).join("");
+    const el = $(id + "Pager");
+    if (rows.length <= PAGE) { el.innerHTML = rows.length ? `<span>${rows.length} rows</span>` : "<span>No rows yet</span>"; return; }
+    el.innerHTML = `<span>${pg * PAGE + 1}-${Math.min(rows.length, pg * PAGE + PAGE)} of ${rows.length}</span>`
+      + `<span class="ctl"><button data-go="first" ${pg ? "" : "disabled"}>«</button><button data-go="prev" ${pg ? "" : "disabled"}>‹ Prev</button>`
+      + `<span>Page ${pg + 1} / ${pages}</span>`
+      + `<button data-go="next" ${pg < pages - 1 ? "" : "disabled"}>Next ›</button><button data-go="last" ${pg < pages - 1 ? "" : "disabled"}>»</button></span>`;
+    el.onclick = e => {
+      const b = e.target.closest("button[data-go]"); if (!b) return;
+      const g = b.dataset.go;
+      pageOf[id] = g === "first" ? 0 : g === "last" ? pages - 1 : g === "prev" ? pg - 1 : pg + 1;
+      paged(id, head, rows);
+    };
+  }
+  function render(db) {
+    DB = db;
+    const { pays, days } = build(db);
+    const sum = k => pays.reduce((a, p) => a + p[k], 0);
+    const open = sum("open"), share = sum("share"), lp = sum("lpFees");
+    const who = new Map();
+    for (const p of pays) {
+      const w = who.get(p.from) || { addr: p.from, n: 0, opens: 0, open: 0, share: 0, lp: 0, last: p.ts };
+      w.n++; w.open += p.open; w.share += p.share; w.lp += p.lpFees; w.opens += p.opens || 0;
+      if (p.ts > w.last) w.last = p.ts;
+      who.set(p.from, w);
+    }
+    $("meta").textContent = `Updated ${timeOf(db.updatedAt)} WIB · ${db.payments.length} payments since ${db.payments.length ? timeOf(db.payments[db.payments.length - 1].ts) : "-"}`;
+    const tile = (k, v, n, color, hero) => `<div class="tile${hero ? " hero" : ""}"><div class="k">${color ? `<i class="sw" style="background:${color}"></i>` : ""}${k}</div><div class="v">${v}</div><div class="n">${n}</div></div>`;
+    $("tiles").innerHTML =
+      tile("Total revenue", usd(open + share), "USDG", null, true)
+      + tile("Open fees", usd(open), `${pays.filter(p => p.open > 0).length} opens`, "var(--s1)")
+      + tile("Fee share", usd(share), `${pays.filter(p => p.share > 0).length} claims / closes`, "var(--s2)")
+      + tile("LP fees collected by users", usd(lp), "USDG, share ÷ 1.5%")
+      + tile("Contributors", String(who.size), "wallets that paid")
+      + tile("Payments", String(pays.length), "transactions");
+    stacked($("daily"), days);
+    line($("cumul"), days, "cum", "Cumulative", "var(--s1)", v => usd(v) + " USDG");
+    line($("lp"), days, "lpFees", "LP fees collected", "var(--s2)", v => usd(v) + " USDG");
+
+    const ws = [...who.values()].sort((a, b) => (b.open + b.share) - (a.open + a.share));
+    paged("who", `<tr><th>#</th><th>Wallet</th><th class="r">Total</th><th class="r">Share of revenue</th><th class="r">Payments</th><th class="r">Open fees</th><th class="r">Fee share</th><th class="r">LP fees they collected</th><th>Last paid (WIB)</th></tr>`,
+      ws.map((w, i) => `<tr><td>${i + 1}</td><td><a class="mono" href="${EXPLORER}/address/${esc(w.addr)}" target="_blank" rel="noopener">${esc(short(w.addr))}</a></td>`
+        + `<td class="r hi">${usd(w.open + w.share)}</td><td class="r">${open + share > 0 ? ((w.open + w.share) / (open + share) * 100).toFixed(1) + "%" : "-"}</td>`
+        + `<td class="r">${w.n}</td><td class="r">${usd(w.open)}</td><td class="r">${usd(w.share)}</td><td class="r">${usd(w.lp)}</td><td>${timeOf(w.last)}</td></tr>`));
+    paged("days", `<tr><th>Day (WIB)</th><th class="r">Total</th><th class="r">Open fees</th><th class="r">Fee share</th><th class="r">LP fees collected</th><th class="r">Payments</th><th class="r">Wallets</th><th class="r">Cumulative</th></tr>`,
+      days.slice().reverse().map(d => `<tr><td>${d.day}</td><td class="r hi">${usd(d.open + d.share)}</td><td class="r">${usd(d.open)}</td><td class="r">${usd(d.share)}</td><td class="r">${usd(d.lpFees)}</td><td class="r">${d.count}</td><td class="r">${d.who.size}</td><td class="r">${usd(d.cum)}</td></tr>`));
+    paged("pays", `<tr><th>Time (WIB)</th><th>Wallet</th><th>Kind</th><th class="r">Open fee</th><th class="r">Fee share</th><th class="r">LP fees collected</th><th>Tx</th></tr>`,
+      pays.map(p => {
+        const kind = p.open > 0 && p.share > 0 ? "Re-entry" : p.open > 0 ? "Open" : "Claim / close";
+        const ink = p.inKind.length ? " + " + p.inKind.map(k => `${k.amount.toPrecision(4)} ${esc(k.sym)}`).join(", ") : "";
+        return `<tr><td>${timeOf(p.ts)}</td><td><a class="mono" href="${EXPLORER}/address/${esc(p.from)}" target="_blank" rel="noopener">${esc(short(p.from))}</a></td><td>${kind}</td>`
+          + `<td class="r">${p.open ? usd(p.open) : ""}</td><td class="r">${p.share ? usd(p.share, 4) : ""}${ink}</td><td class="r">${p.lpFees ? usd(p.lpFees) : ""}</td>`
+          + `<td><a class="mono" href="${EXPLORER}/tx/${esc(p.tx)}" target="_blank" rel="noopener">${esc(p.tx.slice(0, 10))}…</a></td></tr>`;
+      }));
+    const inKind = pays.filter(p => p.inKind.length).length;
+    $("otherNote").textContent = (inKind ? `${inKind} payments included fee share in other tokens (not counted in USDG totals). ` : "")
+      + (db.other && db.other.length ? `${db.other.length} other transfers into the wallet (airdrops, not fees) are excluded.` : "");
+  }
+  $("range").addEventListener("click", e => {
+    const b = e.target.closest("button"); if (!b || !DB) return;
+    for (const x of $("range").children) x.setAttribute("aria-pressed", String(x === b));
+    rangeDays = Number(b.dataset.days); for (const k in pageOf) pageOf[k] = 0; render(DB);
+  });
+  $("csv").addEventListener("click", () => {
+    if (!DB) return;
+    const rows = [["time_utc", "day_wib", "wallet", "kind", "open_fee_usdg", "fee_share_usdg", "lp_fees_collected_usdg", "pools_opened", "tx"]];
+    for (const p of DB.payments) rows.push([p.ts, dayOf(p.ts), p.from, p.open > 0 && p.share > 0 ? "re-entry" : p.open > 0 ? "open" : "claim/close",
+      p.open, p.share, p.lpFees.toFixed(6), p.opens == null ? "" : p.opens, p.tx]);
+    const blob = new Blob([rows.map(r => r.join(",")).join("\n")], { type: "text/csv" });
+    const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = "lp-revenue.csv"; a.click();
+  });
+  let rt; addEventListener("resize", () => { clearTimeout(rt); rt = setTimeout(() => DB && render(DB), 150); });
+})();
+</script>
+</body>
+</html>
